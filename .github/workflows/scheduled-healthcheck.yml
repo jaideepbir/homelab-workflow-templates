@@ -1,0 +1,39 @@
+name: scheduled-healthcheck
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Override URL to check"
+        required: false
+        default: ""
+
+jobs:
+  check:
+    runs-on: [self-hosted, pi5, docker]
+    steps:
+      - name: Check URL
+        env:
+          CHECK_URL: ${{ secrets.CHECK_URL }}
+          INPUT_URL: ${{ github.event.inputs.url }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import sys
+          import urllib.request
+
+          url = os.environ.get("INPUT_URL") or os.environ.get("CHECK_URL")
+          if not url:
+              print("No URL provided. Set CHECK_URL secret or workflow input.")
+              sys.exit(0)
+
+          req = urllib.request.Request(url, method="GET")
+          try:
+              with urllib.request.urlopen(req, timeout=10) as resp:
+                  print(f"{url} -> {resp.status}")
+          except Exception as exc:
+              print(f"{url} -> error: {exc}")
+              sys.exit(2)
+          PY

@@ -1,0 +1,33 @@
+name: dispatch-example
+
+on:
+  repository_dispatch:
+    types: [homelab-event]
+  workflow_dispatch:
+    inputs:
+      payload_json:
+        description: "Optional JSON payload for testing"
+        required: false
+        default: ""
+
+jobs:
+  handle-dispatch:
+    runs-on: [self-hosted, pi5, docker]
+    steps:
+      - name: Print payload
+        env:
+          PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          PAYLOAD_INPUT: ${{ github.event.inputs.payload_json }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+
+          payload = os.environ.get("PAYLOAD")
+          if not payload or payload == "null":
+              payload = os.environ.get("PAYLOAD_INPUT") or "{}"
+          data = json.loads(payload)
+
+          print("Event payload:")
+          print(json.dumps(data, indent=2))
+          PY

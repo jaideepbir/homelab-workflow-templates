@@ -1,0 +1,31 @@
+name: manual-deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: "Kubernetes namespace"
+        required: true
+        default: "default"
+      manifest_path:
+        description: "Path to manifest(s) on runner"
+        required: true
+        default: "/home/jaideepbir/code/projects/example/k8s"
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, pi5, docker]
+    steps:
+      - name: Verify kubectl
+        run: |
+          if ! command -v kubectl >/dev/null 2>&1; then
+            echo "kubectl not found on runner"
+            exit 1
+          fi
+      - name: Apply manifests
+        env:
+          NS: ${{ github.event.inputs.namespace }}
+          PATH_IN: ${{ github.event.inputs.manifest_path }}
+        run: |
+          echo "Applying manifests in $PATH_IN to namespace $NS"
+          kubectl -n "$NS" apply -f "$PATH_IN"
