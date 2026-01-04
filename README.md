@@ -1,7 +1,12 @@
 # homelab-workflow-templates
 
+![Homelab Workflow Templates cover](assets/cover.svg)
+
 Templates for GitHub Actions workflows that run on the homelab self-hosted
 runner (`pi5`, Docker-based).
+
+## Visual overview
+![Workflow flow diagram](assets/flow.svg)
 
 ## Runner labels
 - `self-hosted`
