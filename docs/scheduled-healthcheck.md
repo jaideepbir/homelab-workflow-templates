@@ -1,6 +1,6 @@
 # scheduled-healthcheck
 
-Checks a URL every 30 minutes.
+Checks a URL daily.
 
 ## Usage
 - Set secret `CHECK_URL` in the repo, or pass a `url` input on manual run.
